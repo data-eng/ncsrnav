@@ -18,6 +18,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                        out, "UTF-8"));
+                        out, StandardCharsets.UTF_8));
                 writer.write(data);
                 writer.flush();
 
