@@ -46,20 +46,25 @@ public class MainActivity extends AppCompatActivity {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
+
+        //create context
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         Configuration.getInstance().setUserAgentValue("MyOwnUserAgent/1.0");
         setContentView(R.layout.activity_main);
 
+        //create map
         map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
 
+        //request permissions
         requestPermissionsIfNecessary(new String[]{
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
         });
 
+        //markers
         GeoPoint startPoint = new GeoPoint(37.996458, 23.815177);
         IMapController mapController = map.getController();
         mapController.setZoom(19.3);
