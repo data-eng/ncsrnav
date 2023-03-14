@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">OSMNTut</string>
+    <string-array name="ncsr_locations">
+        <item>Λεύκιππος</item>
+        <item>ΤΕΠΑ</item>
+        <item>Scio</item>
+        <item>Fuelics</item>
+        <item>Βιβλιοθήκη</item>
+        <item>Roboskel</item>
+        <item>Tesla</item>
+        <item>Γραφείο Καινοτομίας</item>
+    </string-array>
 </resources>
