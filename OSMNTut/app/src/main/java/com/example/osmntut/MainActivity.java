@@ -21,10 +21,12 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
+    private String choice = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
         Spinner spinner = (Spinner)findViewById(R.id.destSpinner);
         ArrayAdapter<CharSequence> spinner_adapter = ArrayAdapter.createFromResource(this, R.array.ncsr_locations, android.R.layout.simple_spinner_item);
@@ -34,13 +36,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+        choice = parent.getItemAtPosition(pos).toString();
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
-
+        choice = "";
     }
 
     private static class httpPost extends AsyncTask<Void, Void, Void> {
@@ -67,8 +69,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 urlConnection.setChunkedStreamingMode(0);
 
                 OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                        out, StandardCharsets.UTF_8));
+                BufferedWriter writer;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                    writer = new BufferedWriter(new OutputStreamWriter(
+                            out, StandardCharsets.UTF_8));
+                }
+                else
+                    writer = new BufferedWriter(new OutputStreamWriter(
+                            out, "UTF-8"));
                 writer.write(data);
                 writer.flush();
 
