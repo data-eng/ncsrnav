@@ -1,13 +1,17 @@
 package com.example.osmntut;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -29,15 +33,31 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
 
         Spinner spinner = (Spinner)findViewById(R.id.destSpinner);
+        Button goMap = (Button) findViewById(R.id.mapButton);
         ArrayAdapter<CharSequence> spinner_adapter = ArrayAdapter.createFromResource(this, R.array.ncsr_locations, android.R.layout.simple_spinner_item);
         spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinner_adapter);
         spinner.setOnItemSelectedListener(this);
+
+        goMap.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(), "Button", Toast.LENGTH_LONG).show();
+                openActivity();
+            }
+        });
+    }
+
+    public void openActivity()
+    {
+        Intent intent = new Intent(this, MapActivity.class);
+        startActivity(intent);
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         choice = parent.getItemAtPosition(pos).toString();
+        Toast.makeText(getApplicationContext(), choice, Toast.LENGTH_LONG).show();
     }
 
     @Override
