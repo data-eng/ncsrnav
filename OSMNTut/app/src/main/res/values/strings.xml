@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">OSMNTut</string>
+    <string name="dest">Destination</string>
+    <string name="gotomap">Navigate</string>
+    <string name="destSelectMsg">Select destination:</string>
+    <string-array name="ncsr_locations">
+        <item>Lefkippos</item>
+        <item>Technology Park</item>
+        <item>SCio</item>
+        <item>Fuelics</item>
+        <item>Library</item>
+        <item>Roboskel</item>
+        <item>Tesla</item>
+        <item>Innovation Office</item>
+    </string-array>
+</resources>
