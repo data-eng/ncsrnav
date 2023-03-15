@@ -2,9 +2,12 @@ package com.example.osmntut;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,9 +27,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
     private String choice = "";
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,17 +40,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         acdropdown.setThreshold(1);
         Button goMap = findViewById(R.id.mapButton);
         ArrayAdapter<CharSequence> acAdapter = ArrayAdapter.createFromResource(this, R.array.ncsr_locations, android.R.layout.select_dialog_item);
-//        acAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         acdropdown.setAdapter(acAdapter);
-        acdropdown.setOnItemSelectedListener(this);
-
-        goMap.setOnClickListener(new View.OnClickListener(){
+        acdropdown.setOnItemClickListener(this);
+        acdropdown.setOnTouchListener((view, motionEvent) -> {
+            acdropdown.showDropDown();
+            return false;
+        });
+        acdropdown.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Button", Toast.LENGTH_LONG).show();
-                openActivity();
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(acdropdown.getText().toString().equals(""))
+                    choice = "";
             }
         });
+
+        goMap.setOnClickListener(view -> openActivity());
     }
 
     public void openActivity()
@@ -56,14 +68,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+    public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
         choice = parent.getItemAtPosition(pos).toString();
         Toast.makeText(getApplicationContext(), choice, Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-        choice = "";
     }
 
     private static class httpPost extends AsyncTask<Void, Void, Void> {
