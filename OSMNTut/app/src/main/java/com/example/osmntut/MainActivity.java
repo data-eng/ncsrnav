@@ -9,8 +9,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.BufferedOutputStream;
@@ -32,12 +32,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Spinner spinner = (Spinner)findViewById(R.id.destSpinner);
-        Button goMap = (Button) findViewById(R.id.mapButton);
-        ArrayAdapter<CharSequence> spinner_adapter = ArrayAdapter.createFromResource(this, R.array.ncsr_locations, android.R.layout.simple_spinner_item);
-        spinner_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(spinner_adapter);
-        spinner.setOnItemSelectedListener(this);
+        AutoCompleteTextView acdropdown = findViewById(R.id.acDropdown);
+        acdropdown.setThreshold(1);
+        Button goMap = findViewById(R.id.mapButton);
+        ArrayAdapter<CharSequence> acAdapter = ArrayAdapter.createFromResource(this, R.array.ncsr_locations, android.R.layout.select_dialog_item);
+//        acAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+        acdropdown.setAdapter(acAdapter);
+        acdropdown.setOnItemSelectedListener(this);
 
         goMap.setOnClickListener(new View.OnClickListener(){
             @Override
