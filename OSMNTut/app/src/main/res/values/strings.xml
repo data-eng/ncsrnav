@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">OSMNTut</string>
+    <string name="dest">Destination</string>
+    <string name="gotomap">Go</string>
     <string-array name="ncsr_locations">
         <item>Λεύκιππος</item>
         <item>ΤΕΠΑ</item>
