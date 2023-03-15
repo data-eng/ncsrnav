@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">OSMNTut</string>
-    <string name="dest">Where to go?</string>
+    <string name="dest">Touch to enter</string>
     <string name="gotomap">Navigate</string>
     <string name="destSelectMsg">Select destination:</string>
     <string-array name="ncsr_locations">
