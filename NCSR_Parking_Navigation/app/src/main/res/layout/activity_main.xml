@@ -72,13 +72,28 @@
         app:layout_constraintHorizontal_bias="0.053"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <TextView
+        android:id="@+id/resultMsg"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="236dp"
+        android:gravity="center_horizontal"
+        android:paddingVertical="15dp"
+        android:text="@string/msg"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <Button
         android:id="@+id/mapButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="200dp"
-        android:text="@string/gotomap"
-        android:visibility="invisible"
+        android:layout_marginBottom="160dp"
+        android:text="@string/btnFunc"
+        android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.473"
@@ -116,12 +131,14 @@
             android:id="@+id/disability"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:checked="false"
             android:text="@string/rb1" />
 
         <RadioButton
             android:id="@+id/longv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:checked="false"
             android:text="@string/rb2" />
     </RadioGroup>
 
