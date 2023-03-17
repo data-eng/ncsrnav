@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -16,6 +17,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedOutputStream;
@@ -28,6 +30,8 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
     private String choice = "";
@@ -40,6 +44,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
 
         AutoCompleteTextView acdropdown = findViewById(R.id.acDropdown);
+        radioGroup = findViewById(R.id.constrGroup);
+        TextView resultText = findViewById(R.id.resultMsg);
+        resultText.setBackgroundColor(Color.parseColor("#abf5a7"));
         acdropdown.setThreshold(1);
         Button goMap = findViewById(R.id.mapButton);
         ArrayAdapter<CharSequence> acAdapter = ArrayAdapter.createFromResource(this, R.array.ncsr_locations, android.R.layout.select_dialog_item);
@@ -58,21 +65,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public void afterTextChanged(Editable editable) {
                 if(acdropdown.getText().toString().equals(""))
                     choice = "";
+                else
+                    goMap.setEnabled(true);
             }
         });
 
         goMap.setOnClickListener(view -> openActivity());
-        radioGroup = (RadioGroup) findViewById(R.id.constrGroup);
     }
 
     public void onRadioButtonClicked(View view){
         int selectedId = radioGroup.getCheckedRadioButtonId();
-        RadioButton constraintRadioBtn = (RadioButton) findViewById(selectedId);
+        RadioButton constraintRadioBtn = findViewById(selectedId);
 
         if(selectedId == -1)
             Toast.makeText(getApplicationContext(), "No constraint selected!", Toast.LENGTH_LONG).show();
-        else
+        else {
             Toast.makeText(getApplicationContext(), constraintRadioBtn.getText(), Toast.LENGTH_LONG).show();
+            List<String> ncsr_locations = Arrays.asList(getResources().getStringArray(R.array.ncsr_locations));
+
+//            if(ncsr_locations.contains(choice)){
+//                //do stuff
+//            }
+        }
     }
 
     public void openActivity()
