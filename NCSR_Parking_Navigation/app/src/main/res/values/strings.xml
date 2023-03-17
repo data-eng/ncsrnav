@@ -3,12 +3,13 @@
     <string name="dest">Touch to enter</string>
     <string name="logoTextMsg">Parking Navigation</string>
     <string name="logoDescription">NCSR Logo</string>
-    <string name="gotomap">Navigate</string>
+    <string name="btnFunc">Find spot</string>
     <string name="destSelectMsg">Select destination:</string>
     <string name="rbTextMsg">I need space for:</string>
     <string name="rb0">Regular</string>
     <string name="rb1">Motability car</string>
     <string name="rb2">Long vehicle</string>
+    <string name="msg">Result Message</string>
     <string-array name="ncsr_locations">
         <item>Lefkippos</item>
         <item>Technology Park</item>
