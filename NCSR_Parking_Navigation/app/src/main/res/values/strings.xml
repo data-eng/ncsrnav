@@ -6,6 +6,7 @@
     <string name="gotomap">Navigate</string>
     <string name="destSelectMsg">Select destination:</string>
     <string name="rbTextMsg">I need space for:</string>
+    <string name="rb0">Regular</string>
     <string name="rb1">Motability car</string>
     <string name="rb2">Long vehicle</string>
     <string-array name="ncsr_locations">
