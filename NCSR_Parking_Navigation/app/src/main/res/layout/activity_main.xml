@@ -34,10 +34,12 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <View
-        android:id="@+id/view"
+        android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginBottom="624dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
         android:background="@android:color/darker_gray"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -50,12 +52,13 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="188dp"
         android:text="@string/gotomap"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <RadioGroup
+    <RadioGroup android:id="@+id/constrGroup"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="488dp"
@@ -79,6 +82,7 @@
             android:id="@+id/disability"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:checked="true"
             android:text="@string/rb1" />
 
         <RadioButton
