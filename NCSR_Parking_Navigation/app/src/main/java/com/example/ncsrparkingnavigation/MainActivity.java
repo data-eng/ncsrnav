@@ -14,6 +14,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import java.io.BufferedOutputStream;
@@ -29,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
     private String choice = "";
+    private RadioGroup radioGroup;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -59,6 +62,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
 
         goMap.setOnClickListener(view -> openActivity());
+        radioGroup = (RadioGroup) findViewById(R.id.constrGroup);
+    }
+
+    public void onRadioButtonClicked(View view){
+        int selectedId = radioGroup.getCheckedRadioButtonId();
+        RadioButton constraintRadioBtn = (RadioButton) findViewById(selectedId);
+
+        if(selectedId == -1)
+            Toast.makeText(getApplicationContext(), "No constraint selected!", Toast.LENGTH_LONG).show();
+        else
+            Toast.makeText(getApplicationContext(), constraintRadioBtn.getText(), Toast.LENGTH_LONG).show();
     }
 
     public void openActivity()
