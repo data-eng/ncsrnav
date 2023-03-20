@@ -20,6 +20,8 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.JsonParser;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -100,7 +102,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 resultText.setText(getString(R.string.invalidConstraintMsg));
             }
             else {
-                resultText.setBackgroundColor(Color.parseColor("#abf5a7"));
                 //data fetching
                 new AsyncTask<String, Void, String>(){
                     @Override
@@ -204,7 +205,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         }
 
                         JSONObject jsonParser = null;
-                        JSONArray idArray = null;
                         try {
                             jsonParser = new JSONObject(json_data.toString());
 
@@ -220,11 +220,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                         //check constraints and rules
                         String foundSpot = "";
-                        boolean found = false;
                         String constraintData = constraintRadioBtn.getText().toString();
                         if(constraintData.equals(getString(R.string.rb1))){
                             if(resultData.contains("399")) {
-                                found = true;
                                 foundSpot = "399";
                             }
                         }
@@ -243,266 +241,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             if(choice.equals("Lefkippos") || choice.equals("Technology Park") || choice.equals("SCio")
                                     || choice.equals("Fuelics")){
 
-                                for(String str : order1) {
-                                    try {
-                                        idArray = jsonParser.getJSONObject(str).getJSONArray("id");
-                                    } catch (JSONException e) {
-                                        throw new RuntimeException(e);
-                                    }
-
-                                    if(constraintData.equals(getString(R.string.rb2))) {
-                                        for (int i = 0; i < idArray.length() - 1; i++) {
-                                            try {
-                                                if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
-                                                    found = true;
-                                                    foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
-                                                    break;
-                                                }
-                                            } catch (JSONException e) {
-                                                throw new RuntimeException(e);
-                                            }
-                                        }
-                                    }
-                                    else{
-                                        for (int i = 0; i < idArray.length(); i++) {
-                                            try {
-                                                if (resultData.contains(idArray.getString(i))) {
-                                                    found = true;
-                                                    foundSpot = idArray.getString(i);
-                                                    break;
-                                                }
-                                            } catch (JSONException e) {
-                                                throw new RuntimeException(e);
-                                            }
-                                        }
-                                    }
-
-                                    if(found) break;
-                                }
+                                foundSpot = getParkingSpot(order1, jsonParser, constraintData);
                             }
                             else if(choice.equals("Tesla")){
-                                for(String str : order2) {
-                                    try {
-                                        idArray = jsonParser.getJSONObject(str).getJSONArray("id");
-                                    } catch (JSONException e) {
-                                        throw new RuntimeException(e);
-                                    }
-
-                                    if(constraintData.equals(getString(R.string.rb2))) {
-                                        for (int i = 0; i < idArray.length() - 1; i++) {
-                                            try {
-                                                if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
-                                                    found = true;
-                                                    foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
-                                                    break;
-                                                }
-                                            } catch (JSONException e) {
-                                                throw new RuntimeException(e);
-                                            }
-                                        }
-                                    }
-                                    else{
-                                        for (int i = 0; i < idArray.length(); i++) {
-                                            try {
-                                                if (resultData.contains(idArray.getString(i))) {
-                                                    found = true;
-                                                    foundSpot = idArray.getString(i);
-                                                    break;
-                                                }
-                                            } catch (JSONException e) {
-                                                throw new RuntimeException(e);
-                                            }
-                                        }
-                                    }
-
-                                    if(found) break;
-                                }
+                                foundSpot = getParkingSpot(order2, jsonParser, constraintData);
                             }
                             else if(choice.equals("Roboskel")){
-                                for(String str : order3) {
-                                    try {
-                                        idArray = jsonParser.getJSONObject(str).getJSONArray("id");
-                                    } catch (JSONException e) {
-                                        throw new RuntimeException(e);
-                                    }
-
-                                    if(constraintData.equals(getString(R.string.rb2))) {
-                                        for (int i = 0; i < idArray.length() - 1; i++) {
-                                            try {
-                                                if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
-                                                    found = true;
-                                                    foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
-                                                    break;
-                                                }
-                                            } catch (JSONException e) {
-                                                throw new RuntimeException(e);
-                                            }
-                                        }
-                                    }
-                                    else{
-                                        for (int i = 0; i < idArray.length(); i++) {
-                                            try {
-                                                if (resultData.contains(idArray.getString(i))) {
-                                                    found = true;
-                                                    foundSpot = idArray.getString(i);
-                                                    break;
-                                                }
-                                            } catch (JSONException e) {
-                                                throw new RuntimeException(e);
-                                            }
-                                        }
-                                    }
-
-                                    if(found) break;
-                                }
+                                foundSpot = getParkingSpot(order3, jsonParser, constraintData);
                             }
                             else if(choice.equals("Library") || choice.equals("Innovation Office")){
-                                for(String str : order4) {
-                                    try {
-                                        idArray = jsonParser.getJSONObject(str).getJSONArray("id");
-                                    } catch (JSONException e) {
-                                        throw new RuntimeException(e);
-                                    }
-
-                                    if(constraintData.equals(getString(R.string.rb2))) {
-                                        for (int i = 0; i < idArray.length() - 1; i++) {
-                                            try {
-                                                if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
-                                                    found = true;
-                                                    foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
-                                                    break;
-                                                }
-                                            } catch (JSONException e) {
-                                                throw new RuntimeException(e);
-                                            }
-                                        }
-                                    }
-                                    else{
-                                        for (int i = 0; i < idArray.length(); i++) {
-                                            try {
-                                                if (resultData.contains(idArray.getString(i))) {
-                                                    found = true;
-                                                    foundSpot = idArray.getString(i);
-                                                    break;
-                                                }
-                                            } catch (JSONException e) {
-                                                throw new RuntimeException(e);
-                                            }
-                                        }
-                                    }
-
-                                    if(found) break;
-                                }
+                                foundSpot = getParkingSpot(order4, jsonParser, constraintData);
                             }
                         }
-//                        else if(constraintData.equals(getString(R.string.rb2))){
-//                            if(choice.equals("Lefkippos") || choice.equals("Technology Park") || choice.equals("SCio")
-//                                    || choice.equals("Fuelics")){
-//
-//                                order1.remove("Lefkippos1");
-//                                order1.remove("Library2");
-//
-//                                for(String str : order1) {
-//                                    try {
-//                                        idArray = jsonParser.getJSONObject(str).getJSONArray("id");
-//                                    } catch (JSONException e) {
-//                                        throw new RuntimeException(e);
-//                                    }
-//
-//                                    for (int i = 0; i < idArray.length() - 1; i++) {
-//                                        try {
-//                                            if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
-//                                                found = true;
-//                                                foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
-//                                                break;
-//                                            }
-//                                        } catch (JSONException e) {
-//                                            throw new RuntimeException(e);
-//                                        }
-//                                    }
-//
-//                                    if(found) break;
-//                                }
-//                            }
-//                            else if(choice.equals("Tesla")){
-//                                order2.remove("Lefkippos1");
-//                                order2.remove("Library2");
-//
-//                                for(String str : order2) {
-//                                    try {
-//                                        idArray = jsonParser.getJSONObject(str).getJSONArray("id");
-//                                    } catch (JSONException e) {
-//                                        throw new RuntimeException(e);
-//                                    }
-//
-//                                    for (int i = 0; i < idArray.length() - 1; i++) {
-//                                        try {
-//                                            if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
-//                                                found = true;
-//                                                foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
-//                                                break;
-//                                            }
-//                                        } catch (JSONException e) {
-//                                            throw new RuntimeException(e);
-//                                        }
-//                                    }
-//
-//                                    if(found) break;
-//                                }
-//                            }
-//                            else if(choice.equals("Roboskel")){
-//                                order3.remove("Lefkippos1");
-//                                order3.remove("Library2");
-//
-//                                for(String str : order3) {
-//                                    try {
-//                                        idArray = jsonParser.getJSONObject(str).getJSONArray("id");
-//                                    } catch (JSONException e) {
-//                                        throw new RuntimeException(e);
-//                                    }
-//
-//                                    for (int i = 0; i < idArray.length() - 1; i++) {
-//                                        try {
-//                                            if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
-//                                                found = true;
-//                                                foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
-//                                                break;
-//                                            }
-//                                        } catch (JSONException e) {
-//                                            throw new RuntimeException(e);
-//                                        }
-//                                    }
-//
-//                                    if(found) break;
-//                                }
-//                            }
-//                            else if(choice.equals("Library") || choice.equals("Innovation Office")){
-//                                order4.remove("Lefkippos1");
-//                                order4.remove("Library2");
-//
-//                                for(String str : order4) {
-//                                    try {
-//                                        idArray = jsonParser.getJSONObject(str).getJSONArray("id");
-//                                    } catch (JSONException e) {
-//                                        throw new RuntimeException(e);
-//                                    }
-//
-//                                    for (int i = 0; i < idArray.length() - 1; i++) {
-//                                        try {
-//                                            if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
-//                                                found = true;
-//                                                foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
-//                                                break;
-//                                            }
-//                                        } catch (JSONException e) {
-//                                            throw new RuntimeException(e);
-//                                        }
-//                                    }
-//
-//                                    if(found) break;
-//                                }
-//                            }
-//                        }
+
+                        if(foundSpot.equals("")){
+                            resultText.setBackgroundColor(Color.parseColor("#ffb976"));
+                            resultText.setText(getString(R.string.noVacancyMsg));
+                        }
+                        else{
+                            resultText.setBackgroundColor(Color.parseColor("#abf5a7"));
+                            resultText.setText(foundSpot);
+                        }
+                        resultText.setVisibility(View.VISIBLE);
                     }
                 }.execute("http://83.212.75.16:8086/api/v2/query?orgID=4180de514f7a8ab2");
             }
@@ -520,5 +280,50 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
         choice = parent.getItemAtPosition(pos).toString();
         Toast.makeText(getApplicationContext(), choice, Toast.LENGTH_LONG).show();
+    }
+
+    private String getParkingSpot(List<String> ruleOrder, JSONObject jsonPrsr, String constraint)
+    {
+        JSONArray idArray;
+        String foundSpot = "";
+        boolean found = false;
+        for(String str : ruleOrder) {
+            try {
+                idArray = jsonPrsr.getJSONObject(str).getJSONArray("id");
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+
+            if(constraint.equals(getString(R.string.rb2))) {
+                for (int i = 0; i < (idArray.length() - 1); i++) {
+                    try {
+                        if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
+                            found = true;
+                            foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
+                            break;
+                        }
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+            else{
+                for (int i = 0; i < idArray.length(); i++) {
+                    try {
+                        if (resultData.contains(idArray.getString(i))) {
+                            found = true;
+                            foundSpot = idArray.getString(i);
+                            break;
+                        }
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+
+            if(found) break;
+        }
+
+        return foundSpot;
     }
 }
