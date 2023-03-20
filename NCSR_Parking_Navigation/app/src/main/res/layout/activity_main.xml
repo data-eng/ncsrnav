@@ -79,7 +79,6 @@
         android:layout_marginBottom="236dp"
         android:gravity="center_horizontal"
         android:paddingVertical="15dp"
-        android:text="@string/msg"
         android:visibility="invisible"
         android:textStyle="bold"
         android:textColor="@color/black"
