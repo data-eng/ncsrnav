@@ -10,6 +10,9 @@
     <string name="rb1">Motability car</string>
     <string name="rb2">Long vehicle</string>
     <string name="msg">Result Message</string>
+    <string name="invalidMsg">Invalid selection</string>
+    <string name="invalidConstraintMsg">No constraint selected</string>
+    <string name="loadingBtn">Searching…</string>
     <string-array name="ncsr_locations">
         <item>Lefkippos</item>
         <item>Technology Park</item>
