@@ -20,10 +20,15 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -32,7 +37,9 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
     private String choice = "";
@@ -169,7 +176,333 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         }
                         resultData.remove(0);
 
+                        StringBuilder csv_data = new StringBuilder();
+                        StringBuilder json_data = new StringBuilder();
 
+                        //read parking csv
+                        try {
+                            BufferedReader rd = new BufferedReader(new InputStreamReader(getAssets().open("parking-static.csv")));
+                            String line;
+                            while ((line = rd.readLine()) != null){
+                                csv_data.append(line).append("\n");
+                            }
+                            rd.close();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        //read json with parking spot id's
+                        try {
+                            BufferedReader rd = new BufferedReader(new InputStreamReader(getAssets().open("parking-list.json")));
+                            String line;
+                            while ((line = rd.readLine()) != null){
+                                json_data.append(line).append("\n");
+                            }
+                            rd.close();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        JSONObject jsonParser = null;
+                        JSONArray idArray = null;
+                        try {
+                            jsonParser = new JSONObject(json_data.toString());
+
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        //check order
+                        List<String> order1 = Arrays.asList("Lefkippos1","Lefkippos2","Tesla","Library1","Library2");
+                        List<String> order2 = Arrays.asList("Tesla","Lefkippos1","Lefkippos2","Library1","Library2");
+                        List<String> order3 = Arrays.asList("Library2","Library1","Tesla","Lefkippos1","Lefkippos2");
+                        List<String> order4 = Arrays.asList("Library1","Library2","Tesla","Lefkippos1","Lefkippos2");
+
+                        //check constraints and rules
+                        String foundSpot = "";
+                        boolean found = false;
+                        String constraintData = constraintRadioBtn.getText().toString();
+                        if(constraintData.equals(getString(R.string.rb1))){
+                            if(resultData.contains("399")) {
+                                found = true;
+                                foundSpot = "399";
+                            }
+                        }
+                        else{
+                            if(constraintData.equals(getString(R.string.rb2))) {
+                                order1.remove("Lefkippos1");
+                                order1.remove("Library2");
+                                order2.remove("Lefkippos1");
+                                order2.remove("Library2");
+                                order3.remove("Lefkippos1");
+                                order3.remove("Library2");
+                                order4.remove("Lefkippos1");
+                                order4.remove("Library2");
+                            }
+
+                            if(choice.equals("Lefkippos") || choice.equals("Technology Park") || choice.equals("SCio")
+                                    || choice.equals("Fuelics")){
+
+                                for(String str : order1) {
+                                    try {
+                                        idArray = jsonParser.getJSONObject(str).getJSONArray("id");
+                                    } catch (JSONException e) {
+                                        throw new RuntimeException(e);
+                                    }
+
+                                    if(constraintData.equals(getString(R.string.rb2))) {
+                                        for (int i = 0; i < idArray.length() - 1; i++) {
+                                            try {
+                                                if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
+                                                    found = true;
+                                                    foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
+                                                    break;
+                                                }
+                                            } catch (JSONException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        }
+                                    }
+                                    else{
+                                        for (int i = 0; i < idArray.length(); i++) {
+                                            try {
+                                                if (resultData.contains(idArray.getString(i))) {
+                                                    found = true;
+                                                    foundSpot = idArray.getString(i);
+                                                    break;
+                                                }
+                                            } catch (JSONException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        }
+                                    }
+
+                                    if(found) break;
+                                }
+                            }
+                            else if(choice.equals("Tesla")){
+                                for(String str : order2) {
+                                    try {
+                                        idArray = jsonParser.getJSONObject(str).getJSONArray("id");
+                                    } catch (JSONException e) {
+                                        throw new RuntimeException(e);
+                                    }
+
+                                    if(constraintData.equals(getString(R.string.rb2))) {
+                                        for (int i = 0; i < idArray.length() - 1; i++) {
+                                            try {
+                                                if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
+                                                    found = true;
+                                                    foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
+                                                    break;
+                                                }
+                                            } catch (JSONException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        }
+                                    }
+                                    else{
+                                        for (int i = 0; i < idArray.length(); i++) {
+                                            try {
+                                                if (resultData.contains(idArray.getString(i))) {
+                                                    found = true;
+                                                    foundSpot = idArray.getString(i);
+                                                    break;
+                                                }
+                                            } catch (JSONException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        }
+                                    }
+
+                                    if(found) break;
+                                }
+                            }
+                            else if(choice.equals("Roboskel")){
+                                for(String str : order3) {
+                                    try {
+                                        idArray = jsonParser.getJSONObject(str).getJSONArray("id");
+                                    } catch (JSONException e) {
+                                        throw new RuntimeException(e);
+                                    }
+
+                                    if(constraintData.equals(getString(R.string.rb2))) {
+                                        for (int i = 0; i < idArray.length() - 1; i++) {
+                                            try {
+                                                if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
+                                                    found = true;
+                                                    foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
+                                                    break;
+                                                }
+                                            } catch (JSONException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        }
+                                    }
+                                    else{
+                                        for (int i = 0; i < idArray.length(); i++) {
+                                            try {
+                                                if (resultData.contains(idArray.getString(i))) {
+                                                    found = true;
+                                                    foundSpot = idArray.getString(i);
+                                                    break;
+                                                }
+                                            } catch (JSONException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        }
+                                    }
+
+                                    if(found) break;
+                                }
+                            }
+                            else if(choice.equals("Library") || choice.equals("Innovation Office")){
+                                for(String str : order4) {
+                                    try {
+                                        idArray = jsonParser.getJSONObject(str).getJSONArray("id");
+                                    } catch (JSONException e) {
+                                        throw new RuntimeException(e);
+                                    }
+
+                                    if(constraintData.equals(getString(R.string.rb2))) {
+                                        for (int i = 0; i < idArray.length() - 1; i++) {
+                                            try {
+                                                if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
+                                                    found = true;
+                                                    foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
+                                                    break;
+                                                }
+                                            } catch (JSONException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        }
+                                    }
+                                    else{
+                                        for (int i = 0; i < idArray.length(); i++) {
+                                            try {
+                                                if (resultData.contains(idArray.getString(i))) {
+                                                    found = true;
+                                                    foundSpot = idArray.getString(i);
+                                                    break;
+                                                }
+                                            } catch (JSONException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        }
+                                    }
+
+                                    if(found) break;
+                                }
+                            }
+                        }
+//                        else if(constraintData.equals(getString(R.string.rb2))){
+//                            if(choice.equals("Lefkippos") || choice.equals("Technology Park") || choice.equals("SCio")
+//                                    || choice.equals("Fuelics")){
+//
+//                                order1.remove("Lefkippos1");
+//                                order1.remove("Library2");
+//
+//                                for(String str : order1) {
+//                                    try {
+//                                        idArray = jsonParser.getJSONObject(str).getJSONArray("id");
+//                                    } catch (JSONException e) {
+//                                        throw new RuntimeException(e);
+//                                    }
+//
+//                                    for (int i = 0; i < idArray.length() - 1; i++) {
+//                                        try {
+//                                            if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
+//                                                found = true;
+//                                                foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
+//                                                break;
+//                                            }
+//                                        } catch (JSONException e) {
+//                                            throw new RuntimeException(e);
+//                                        }
+//                                    }
+//
+//                                    if(found) break;
+//                                }
+//                            }
+//                            else if(choice.equals("Tesla")){
+//                                order2.remove("Lefkippos1");
+//                                order2.remove("Library2");
+//
+//                                for(String str : order2) {
+//                                    try {
+//                                        idArray = jsonParser.getJSONObject(str).getJSONArray("id");
+//                                    } catch (JSONException e) {
+//                                        throw new RuntimeException(e);
+//                                    }
+//
+//                                    for (int i = 0; i < idArray.length() - 1; i++) {
+//                                        try {
+//                                            if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
+//                                                found = true;
+//                                                foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
+//                                                break;
+//                                            }
+//                                        } catch (JSONException e) {
+//                                            throw new RuntimeException(e);
+//                                        }
+//                                    }
+//
+//                                    if(found) break;
+//                                }
+//                            }
+//                            else if(choice.equals("Roboskel")){
+//                                order3.remove("Lefkippos1");
+//                                order3.remove("Library2");
+//
+//                                for(String str : order3) {
+//                                    try {
+//                                        idArray = jsonParser.getJSONObject(str).getJSONArray("id");
+//                                    } catch (JSONException e) {
+//                                        throw new RuntimeException(e);
+//                                    }
+//
+//                                    for (int i = 0; i < idArray.length() - 1; i++) {
+//                                        try {
+//                                            if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
+//                                                found = true;
+//                                                foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
+//                                                break;
+//                                            }
+//                                        } catch (JSONException e) {
+//                                            throw new RuntimeException(e);
+//                                        }
+//                                    }
+//
+//                                    if(found) break;
+//                                }
+//                            }
+//                            else if(choice.equals("Library") || choice.equals("Innovation Office")){
+//                                order4.remove("Lefkippos1");
+//                                order4.remove("Library2");
+//
+//                                for(String str : order4) {
+//                                    try {
+//                                        idArray = jsonParser.getJSONObject(str).getJSONArray("id");
+//                                    } catch (JSONException e) {
+//                                        throw new RuntimeException(e);
+//                                    }
+//
+//                                    for (int i = 0; i < idArray.length() - 1; i++) {
+//                                        try {
+//                                            if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
+//                                                found = true;
+//                                                foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
+//                                                break;
+//                                            }
+//                                        } catch (JSONException e) {
+//                                            throw new RuntimeException(e);
+//                                        }
+//                                    }
+//
+//                                    if(found) break;
+//                                }
+//                            }
+//                        }
                     }
                 }.execute("http://83.212.75.16:8086/api/v2/query?orgID=4180de514f7a8ab2");
             }
@@ -188,67 +521,4 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         choice = parent.getItemAtPosition(pos).toString();
         Toast.makeText(getApplicationContext(), choice, Toast.LENGTH_LONG).show();
     }
-
-//    private static class httpPost extends AsyncTask<Void, Void, Void> {
-//        @Override
-//        protected void onPreExecute(){
-//            super.onPreExecute();
-//        }
-//
-//        @Override
-//        protected Void doInBackground(Void... params) {
-//            HttpURLConnection urlConnection = null;
-//
-//            String data = "from(bucket: \"gigacampus2-parking\") " +
-//                    "|> range(start: -5m) " +
-//                    "|> filter(fn: (r) => r._measurement == \"parking_status\" and r._field == \"occupied\" and r._value == 0) " +
-//                    "|> group( columns: [\"id\"] ) |> sort( columns: [\"_time\"], desc: false ) " +
-//                    "|> last() |> keep( columns: [\"id\"] ) |> group()";
-//
-//            try {
-//
-//                URL url = new URL("http://83.212.75.16:8086/api/v2/query?orgID=4180de514f7a8ab2");
-//                urlConnection = (HttpURLConnection) url.openConnection();
-//                urlConnection.setRequestMethod("POST");
-//                urlConnection.setRequestProperty("Authorization", "Token OpZihwsUM-5IrinGcpH0CDD2cXP9tbFWikdP6kgZlRLXjySElZwLqn5mLfHfmoR6hVtKCF-XmmeMOB20OIe8-w==");
-//                urlConnection.setRequestProperty("Accept", "application/csv");
-//                urlConnection.setRequestProperty("Content-Type", "application/vnd.flux");
-//                urlConnection.setDoOutput(true);
-//                urlConnection.setDoInput(true);
-//                urlConnection.setChunkedStreamingMode(0);
-//
-//                OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
-//                BufferedWriter writer;
-//                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-//                    writer = new BufferedWriter(new OutputStreamWriter(
-//                            out, StandardCharsets.UTF_8));
-//                }
-//                else
-//                    writer = new BufferedWriter(new OutputStreamWriter(
-//                            out, "UTF-8"));
-//                writer.write(data);
-//                writer.flush();
-//
-//                int code = urlConnection.getResponseCode();
-//                if (code !=  200) {
-//                    throw new IOException("Invalid response from server: " + code);
-//                }
-//
-//                BufferedReader rd = new BufferedReader(new InputStreamReader(
-//                        urlConnection.getInputStream()));
-//                String line;
-//                while ((line = rd.readLine()) != null) {
-//                    Log.i("data", line);
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            } finally {
-//                if (urlConnection != null) {
-//                    urlConnection.disconnect();
-//                }
-//            }
-//
-//            return null;
-//        }
-//    }
 }
