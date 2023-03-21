@@ -34,6 +34,18 @@ public class MapActivity extends AppCompatActivity {
             StrictMode.setThreadPolicy(policy);
         }
 
+        //get found lat and lon
+        double foundLat, foundLon;
+        Bundle extras = getIntent().getExtras();
+        if(extras != null){
+            foundLat = Double.parseDouble(extras.getString("lat"));
+            foundLon = Double.parseDouble(extras.getString("lon"));
+        }
+        else{
+            foundLat = 0.0;
+            foundLon = 0.0;
+        }
+
         //create context
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
@@ -52,7 +64,8 @@ public class MapActivity extends AppCompatActivity {
         });
 
         //markers
-        GeoPoint startPoint = new GeoPoint(37.996458, 23.815177);
+        //starting point (ncsr gate for debugging, current location for prod)
+        GeoPoint startPoint = new GeoPoint(37.9992574, 23.8176810);
         IMapController mapController = map.getController();
         mapController.setZoom(19.3);
         mapController.setCenter(startPoint);
@@ -61,6 +74,14 @@ public class MapActivity extends AppCompatActivity {
         startMarker.setPosition(startPoint);
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         map.getOverlays().add(startMarker);
+        map.invalidate();
+
+        //found point to navigate to
+        GeoPoint endPoint = new GeoPoint(foundLat, foundLon);
+        Marker endMarker = new Marker(map);
+        endMarker.setPosition(endPoint);
+        endMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        map.getOverlays().add(endMarker);
         map.invalidate();
     }
 
