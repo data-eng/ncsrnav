@@ -1,11 +1,20 @@
 <resources>
     <string name="app_name">NCSR_Parking_Navigation</string>
     <string name="dest">Touch to enter</string>
-    <string name="gotomap">Navigate</string>
+    <string name="logoTextMsg">Parking Navigation</string>
+    <string name="logoDescription">NCSR Logo</string>
+    <string name="btnFunc">Find spot</string>
+    <string name="mapBtn">Navigate</string>
     <string name="destSelectMsg">Select destination:</string>
     <string name="rbTextMsg">I need space for:</string>
-    <string name="rb1">Disabilities</string>
+    <string name="rb0">Regular</string>
+    <string name="rb1">Motability car</string>
     <string name="rb2">Long vehicle</string>
+    <string name="invalidMsg">Invalid selection</string>
+    <string name="invalidConstraintMsg">No constraint selected</string>
+    <string name="loadingBtn">Searching…</string>
+    <string name="noVacancyMsg">No free parking spots!</string>
+    <string name="motabilitySpotDesc">Lefkippos motability vehicle spot</string>
     <string-array name="ncsr_locations">
         <item>Lefkippos</item>
         <item>Technology Park</item>

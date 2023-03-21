@@ -14,11 +14,16 @@ import android.os.StrictMode;
 import android.preference.PreferenceManager;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.routing.OSRMRoadManager;
+import org.osmdroid.bonuspack.routing.Road;
+import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polyline;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -32,6 +37,18 @@ public class MapActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
+        }
+
+        //get found lat and lon
+        double foundLat, foundLon;
+        Bundle extras = getIntent().getExtras();
+        if(extras != null){
+            foundLat = Double.parseDouble(extras.getString("lat"));
+            foundLon = Double.parseDouble(extras.getString("lon"));
+        }
+        else{
+            foundLat = 0.0;
+            foundLon = 0.0;
         }
 
         //create context
@@ -52,7 +69,8 @@ public class MapActivity extends AppCompatActivity {
         });
 
         //markers
-        GeoPoint startPoint = new GeoPoint(37.996458, 23.815177);
+        //starting point (ncsr gate for debugging, current location for prod)
+        GeoPoint startPoint = new GeoPoint(37.9990381, 23.8182062);
         IMapController mapController = map.getController();
         mapController.setZoom(19.3);
         mapController.setCenter(startPoint);
@@ -61,6 +79,24 @@ public class MapActivity extends AppCompatActivity {
         startMarker.setPosition(startPoint);
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         map.getOverlays().add(startMarker);
+        map.invalidate();
+
+        //found point to navigate to
+        GeoPoint endPoint = new GeoPoint(foundLat, foundLon);
+        Marker endMarker = new Marker(map);
+        endMarker.setPosition(endPoint);
+        endMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        map.getOverlays().add(endMarker);
+        map.invalidate();
+
+        //road manager
+        RoadManager roadManager = new OSRMRoadManager(this, Configuration.getInstance().getUserAgentValue());
+        ArrayList<GeoPoint> waypoints = new ArrayList<>();
+        waypoints.add(startPoint);
+        waypoints.add(endPoint);
+        Road road = roadManager.getRoad(waypoints);
+        Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
+        map.getOverlays().add(roadOverlay);
         map.invalidate();
     }
 
