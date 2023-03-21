@@ -1,4 +1,4 @@
-package com.example.ncsrparkingnavigation;
+package gr.demokritos.ncsrparkingnavigation;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;

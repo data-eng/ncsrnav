@@ -24,10 +24,10 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name="com.example.ncsrparkingnavigation.MapActivity"
+            android:name="gr.demokritos.ncsrparkingnavigation.MapActivity"
             android:exported="false" />
         <activity
-            android:name="com.example.ncsrparkingnavigation.MainActivity"
+            android:name="gr.demokritos.ncsrparkingnavigation.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
