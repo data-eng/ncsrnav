@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private RadioGroup radioGroup;
     private TextView resultText;
     private Button findSpot;
+    private Button navBtn;
     private List<String> resultData;
     private String foundLat;
     private String foundLon;
@@ -61,7 +62,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         resultText = findViewById(R.id.resultMsg);
         resultData = new ArrayList<>();
         acdropdown.setThreshold(1);
-        findSpot = findViewById(R.id.mapButton);
+        findSpot = findViewById(R.id.findButton);
+        navBtn = findViewById(R.id.mapButton);
         ArrayAdapter<CharSequence> acAdapter = ArrayAdapter.createFromResource(this, R.array.ncsr_locations, android.R.layout.select_dialog_item);
         acdropdown.setAdapter(acAdapter);
         acdropdown.setOnItemClickListener(this);
@@ -87,14 +89,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-        findSpot.setOnClickListener(view -> openActivity());
+        findSpot.setOnClickListener(view -> findAvailableSpot());
+        navBtn.setOnClickListener(view -> openMapActivity());
+    }
+
+    public void openMapActivity()
+    {
+        Intent intent = new Intent(this, MapActivity.class);
+        startActivity(intent);
     }
 
     @SuppressLint("StaticFieldLeak")
-    public void openActivity()
+    public void findAvailableSpot()
     {
-//        Intent intent = new Intent(this, MapActivity.class);
-//        startActivity(intent);
         List<String> ncsr_locations = Arrays.asList(getResources().getStringArray(R.array.ncsr_locations));
         if (ncsr_locations.contains(choice)) {
             resultText.setBackgroundColor(Color.parseColor("#abf5a7"));
@@ -301,6 +308,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             }
                         }
                         resultText.setVisibility(View.VISIBLE);
+                        navBtn.setEnabled(true);
                     }
                 }.execute("http://83.212.75.16:8086/api/v2/query?orgID=4180de514f7a8ab2");
             }
