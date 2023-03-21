@@ -35,7 +35,9 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
     private String choice = "";
@@ -190,6 +192,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             throw new RuntimeException(e);
                         }
 
+                        //convert csv to hashmap
+                        HashMap<String, List<String>> csvHashmap = new HashMap<>();
+                        for(String str : csv_data.toString().split("\n")){
+                            String key = str.split(",")[0];
+                            List<String> value;
+                            if(str.split(",").length == 5)
+                                value = new ArrayList<>(Arrays.asList(str.split(",")[1], str.split(",")[2],
+                                                                    str.split(",")[4]));
+                            else
+                                value = new ArrayList<>(Arrays.asList(str.split(",")[1], str.split(",")[2], ""));
+                            csvHashmap.put(key, value);
+                        }
+
                         //read json with parking spot id's
                         try {
                             BufferedReader rd = new BufferedReader(new InputStreamReader(getAssets().open("parking-list.json")));
@@ -258,7 +273,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         }
                         else{
                             resultText.setBackgroundColor(Color.parseColor("#abf5a7"));
-                            resultText.setText(foundSpot);
+
+                            if(foundSpot.equals("399")) {
+                                resultText.setText(getString(R.string.motabilitySpotDesc));
+                            }
+                            else {
+                                if(foundSpot.contains(",")) {
+                                    String lvSpots = Objects.requireNonNull(csvHashmap.get(foundSpot.split(",")[0])).get(2) + ", "
+                                            + Objects.requireNonNull(csvHashmap.get(foundSpot.split(",")[1])).get(2);
+                                    resultText.setText(lvSpots);
+                                }
+                                else
+                                    resultText.setText(Objects.requireNonNull(csvHashmap.get(foundSpot)).get(2));
+                            }
                         }
                         resultText.setVisibility(View.VISIBLE);
                     }
