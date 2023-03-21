@@ -14,11 +14,16 @@ import android.os.StrictMode;
 import android.preference.PreferenceManager;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.routing.OSRMRoadManager;
+import org.osmdroid.bonuspack.routing.Road;
+import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polyline;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -82,6 +87,16 @@ public class MapActivity extends AppCompatActivity {
         endMarker.setPosition(endPoint);
         endMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         map.getOverlays().add(endMarker);
+        map.invalidate();
+
+        //road manager
+        RoadManager roadManager = new OSRMRoadManager(this, Configuration.getInstance().getUserAgentValue());
+        ArrayList<GeoPoint> waypoints = new ArrayList<>();
+        waypoints.add(startPoint);
+        waypoints.add(endPoint);
+        Road road = roadManager.getRoad(waypoints);
+        Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
+        map.getOverlays().add(roadOverlay);
         map.invalidate();
     }
 
