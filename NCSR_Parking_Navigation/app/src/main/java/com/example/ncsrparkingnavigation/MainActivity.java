@@ -96,6 +96,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void openMapActivity()
     {
         Intent intent = new Intent(this, MapActivity.class);
+        intent.putExtra("lat", foundLat);
+        intent.putExtra("lon", foundLon);
         startActivity(intent);
     }
 
