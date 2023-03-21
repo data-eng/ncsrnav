@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -20,8 +19,6 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.JsonParser;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,7 +27,6 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -39,9 +35,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
     private String choice = "";
@@ -76,10 +70,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
             public void afterTextChanged(Editable editable) {
-                if(acdropdown.getText().toString().equals(""))
+                if(acdropdown.getText().toString().equals("")) {
                     choice = "";
-                else
+                    findSpot.setEnabled(false);
+                }
+                else {
+                    choice = acdropdown.getText().toString();
                     findSpot.setEnabled(true);
+                }
             }
         });
 
@@ -204,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             throw new RuntimeException(e);
                         }
 
-                        JSONObject jsonParser = null;
+                        JSONObject jsonParser;
                         try {
                             jsonParser = new JSONObject(json_data.toString());
 
@@ -213,10 +211,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         }
 
                         //check order
-                        List<String> order1 = Arrays.asList("Lefkippos1","Lefkippos2","Tesla","Library1","Library2");
-                        List<String> order2 = Arrays.asList("Tesla","Lefkippos1","Lefkippos2","Library1","Library2");
-                        List<String> order3 = Arrays.asList("Library2","Library1","Tesla","Lefkippos1","Lefkippos2");
-                        List<String> order4 = Arrays.asList("Library1","Library2","Tesla","Lefkippos1","Lefkippos2");
+                        List<String> order1 = new ArrayList<>(Arrays.asList("Lefkippos1","Lefkippos2","Tesla","Library1","Library2"));
+                        List<String> order2 = new ArrayList<>(Arrays.asList("Tesla","Lefkippos1","Lefkippos2","Library1","Library2"));
+                        List<String> order3 = new ArrayList<>(Arrays.asList("Library2","Library1","Tesla","Lefkippos1","Lefkippos2"));
+                        List<String> order4 = new ArrayList<>(Arrays.asList("Library1","Library2","Tesla","Lefkippos1","Lefkippos2"));
 
                         //check constraints and rules
                         String foundSpot = "";
@@ -270,10 +268,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         else{
             resultText.setBackgroundColor(Color.parseColor("#ffb976"));
             resultText.setText(getString(R.string.invalidMsg));
+            if(resultText.getVisibility() == View.INVISIBLE)
+                resultText.setVisibility(View.VISIBLE);
         }
-
-        if(resultText.getVisibility() == View.INVISIBLE)
-            resultText.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -295,15 +292,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
 
             if(constraint.equals(getString(R.string.rb2))) {
-                for (int i = 0; i < (idArray.length() - 1); i++) {
-                    try {
-                        if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
-                            found = true;
-                            foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
-                            break;
+                if(idArray.length() >= 2) {
+                    for (int i = 0; i < (idArray.length() - 1); i++) {
+                        try {
+                            if (resultData.contains(idArray.getString(i)) && resultData.contains(idArray.getString(i + 1))) {
+                                found = true;
+                                foundSpot = idArray.getString(i) + "," + idArray.getString(i + 1);
+                                break;
+                            }
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
                         }
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
                     }
                 }
             }
