@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -45,6 +46,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private TextView resultText;
     private Button findSpot;
     private List<String> resultData;
+    private String foundLat;
+    private String foundLon;
+    private String foundStreetId;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -133,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                             OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
                             BufferedWriter writer;
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                                 writer = new BufferedWriter(new OutputStreamWriter(
                                         out, StandardCharsets.UTF_8));
                             }
@@ -276,15 +280,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                             if(foundSpot.equals("399")) {
                                 resultText.setText(getString(R.string.motabilitySpotDesc));
+                                foundStreetId = "";
+                                foundLat = Objects.requireNonNull(csvHashmap.get(foundSpot)).get(0);
+                                foundLon = Objects.requireNonNull(csvHashmap.get(foundSpot)).get(1);
                             }
                             else {
                                 if(foundSpot.contains(",")) {
-                                    String lvSpots = Objects.requireNonNull(csvHashmap.get(foundSpot.split(",")[0])).get(2) + ", "
+                                    foundStreetId = Objects.requireNonNull(csvHashmap.get(foundSpot.split(",")[0])).get(2) + ", "
                                             + Objects.requireNonNull(csvHashmap.get(foundSpot.split(",")[1])).get(2);
-                                    resultText.setText(lvSpots);
+                                    resultText.setText(foundStreetId);
+                                    foundLat = Objects.requireNonNull(csvHashmap.get(foundSpot.split(",")[0])).get(0);
+                                    foundLon = Objects.requireNonNull(csvHashmap.get(foundSpot.split(",")[0])).get(1);
                                 }
-                                else
-                                    resultText.setText(Objects.requireNonNull(csvHashmap.get(foundSpot)).get(2));
+                                else {
+                                    foundStreetId = Objects.requireNonNull(csvHashmap.get(foundSpot)).get(2);
+                                    resultText.setText(foundStreetId);
+                                    foundLat = Objects.requireNonNull(csvHashmap.get(foundSpot)).get(0);
+                                    foundLon = Objects.requireNonNull(csvHashmap.get(foundSpot)).get(1);
+                                }
                             }
                         }
                         resultText.setVisibility(View.VISIBLE);
