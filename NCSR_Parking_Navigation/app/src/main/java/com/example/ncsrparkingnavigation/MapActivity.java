@@ -70,7 +70,7 @@ public class MapActivity extends AppCompatActivity {
 
         //markers
         //starting point (ncsr gate for debugging, current location for prod)
-        GeoPoint startPoint = new GeoPoint(37.9992574, 23.8176810);
+        GeoPoint startPoint = new GeoPoint(37.9990381, 23.8182062);
         IMapController mapController = map.getController();
         mapController.setZoom(19.3);
         mapController.setCenter(startPoint);
