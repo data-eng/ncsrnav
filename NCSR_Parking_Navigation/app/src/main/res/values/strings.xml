@@ -13,6 +13,7 @@
     <string name="invalidConstraintMsg">No constraint selected</string>
     <string name="loadingBtn">Searching…</string>
     <string name="noVacancyMsg">No free parking spots!</string>
+    <string name="motabilitySpotDesc">Lefkippos motability vehicle spot</string>
     <string-array name="ncsr_locations">
         <item>Lefkippos</item>
         <item>Technology Park</item>
