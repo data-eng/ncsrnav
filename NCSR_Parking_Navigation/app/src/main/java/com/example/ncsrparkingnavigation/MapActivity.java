@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -23,6 +24,8 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,7 +73,13 @@ public class MapActivity extends AppCompatActivity {
 
         //markers
         //starting point (ncsr gate for debugging, current location for prod)
-        GeoPoint startPoint = new GeoPoint(37.9990381, 23.8182062);
+//        GeoPoint startPoint = new GeoPoint(37.9990381, 23.8182062);
+        GpsMyLocationProvider provider = new GpsMyLocationProvider(this);
+        provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
+        MyLocationNewOverlay locationOverlay = new MyLocationNewOverlay(map);
+        locationOverlay.enableMyLocation();
+        map.invalidate();
+        GeoPoint startPoint = new GeoPoint(locationOverlay.getMyLocation().getLatitude(), locationOverlay.getMyLocation().getLongitude());
         IMapController mapController = map.getController();
         mapController.setZoom(19.3);
         mapController.setCenter(startPoint);
