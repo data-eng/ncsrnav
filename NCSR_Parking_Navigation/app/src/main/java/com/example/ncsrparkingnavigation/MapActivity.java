@@ -6,8 +6,11 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,11 +24,11 @@ import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.util.NetworkLocationIgnorer;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+import org.osmdroid.views.overlay.mylocation.DirectedLocationOverlay;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +36,10 @@ import java.util.Arrays;
 public class MapActivity extends AppCompatActivity {
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
     private MapView map = null;
+    private LocationManager locationManager;
+    private DirectedLocationOverlay myLocationOverlay;
+    private GeoPoint startPoint;
+    private GeoPoint endPoint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,11 +52,10 @@ public class MapActivity extends AppCompatActivity {
         //get found lat and lon
         double foundLat, foundLon;
         Bundle extras = getIntent().getExtras();
-        if(extras != null){
+        if (extras != null) {
             foundLat = Double.parseDouble(extras.getString("lat"));
             foundLon = Double.parseDouble(extras.getString("lon"));
-        }
-        else{
+        } else {
             foundLat = 0.0;
             foundLon = 0.0;
         }
@@ -71,27 +77,36 @@ public class MapActivity extends AppCompatActivity {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
         });
 
+        myLocationOverlay = new DirectedLocationOverlay(this);
+        map.getOverlays().add(myLocationOverlay);
+        map.invalidate();
+
+        //get current location
+        locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
+        Location location = null;
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if(location == null)
+                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        }
+
         //markers
         //starting point (ncsr gate for debugging, current location for prod)
-//        GeoPoint startPoint = new GeoPoint(37.9990381, 23.8182062);
-        GpsMyLocationProvider provider = new GpsMyLocationProvider(this);
-        provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
-        MyLocationNewOverlay locationOverlay = new MyLocationNewOverlay(map);
-        locationOverlay.enableMyLocation();
-        map.invalidate();
-        GeoPoint startPoint = new GeoPoint(locationOverlay.getMyLocation().getLatitude(), locationOverlay.getMyLocation().getLongitude());
+        if(location == null) {
+            startPoint = new GeoPoint(37.9990381, 23.8182062);
+            myLocationOverlay.setEnabled(false);
+        }
+        else {
+            startPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+            myLocationOverlay.setLocation(startPoint);
+        }
+
         IMapController mapController = map.getController();
         mapController.setZoom(19.3);
         mapController.setCenter(startPoint);
 
-        Marker startMarker = new Marker(map);
-        startMarker.setPosition(startPoint);
-        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        map.getOverlays().add(startMarker);
-        map.invalidate();
-
         //found point to navigate to
-        GeoPoint endPoint = new GeoPoint(foundLat, foundLon);
+        endPoint = new GeoPoint(foundLat, foundLon);
         Marker endMarker = new Marker(map);
         endMarker.setPosition(endPoint);
         endMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
@@ -157,4 +172,46 @@ public class MapActivity extends AppCompatActivity {
                     REQUEST_PERMISSIONS_REQUEST_CODE);
         }
     }
+
+//    @Override public void onLocationChanged(final Location pLoc) {
+//        long currentTime = System.currentTimeMillis();
+//        if (mIgnorer.shouldIgnore(pLoc.getProvider(), currentTime))
+//            return;
+//        double dT = currentTime - mLastTime;
+//        if (dT < 100.0){
+//            //Toast.makeText(this, pLoc.getProvider()+" dT="+dT, Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//        mLastTime = currentTime;
+//
+//        GeoPoint newLocation = new GeoPoint(pLoc);
+//        if (!myLocationOverlay.isEnabled()){
+//            //we get the location for the first time:
+//            myLocationOverlay.setEnabled(true);
+//            map.getController().animateTo(newLocation);
+//        }
+//
+//        GeoPoint prevLocation = myLocationOverlay.getLocation();
+//        myLocationOverlay.setLocation(newLocation);
+//        myLocationOverlay.setAccuracy((int)pLoc.getAccuracy());
+//
+//        if (prevLocation != null && pLoc.getProvider().equals(LocationManager.GPS_PROVIDER)){
+//            mSpeed = pLoc.getSpeed() * 3.6;
+//
+//            //TODO: check if speed is not too small
+//            if (mSpeed >= 0.1){
+//                mAzimuthAngleSpeed = pLoc.getBearing();
+//                myLocationOverlay.setBearing(mAzimuthAngleSpeed);
+//            }
+//        }
+//
+//        if (mTrackingMode){
+//            //keep the map view centered on current location:
+//            map.getController().animateTo(newLocation);
+//            map.setMapOrientation(-mAzimuthAngleSpeed);
+//        } else {
+//            //just redraw the location overlay:
+//            map.invalidate();
+//        }
+//    }
 }
