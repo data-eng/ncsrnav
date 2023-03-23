@@ -40,6 +40,10 @@ public class MapActivity extends AppCompatActivity {
     private DirectedLocationOverlay myLocationOverlay;
     private GeoPoint startPoint;
     private GeoPoint endPoint;
+    private LocationListener locationListener;
+
+    public MapActivity() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +72,12 @@ public class MapActivity extends AppCompatActivity {
 
         //create map
         map = (MapView) findViewById(R.id.map);
+        map.setTilesScaledToDpi(true);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
+
+        locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
+        locationListener = new MyLocationListener();
 
         //request permissions
         requestPermissionsIfNecessary(new String[]{
@@ -79,10 +87,8 @@ public class MapActivity extends AppCompatActivity {
 
         myLocationOverlay = new DirectedLocationOverlay(this);
         map.getOverlays().add(myLocationOverlay);
-        map.invalidate();
 
         //get current location
-        locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
         Location location = null;
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -99,6 +105,7 @@ public class MapActivity extends AppCompatActivity {
         else {
             startPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
             myLocationOverlay.setLocation(startPoint);
+            locationListener.onLocationChanged(location);
         }
 
         IMapController mapController = map.getController();
@@ -131,6 +138,14 @@ public class MapActivity extends AppCompatActivity {
         //if you make changes to the configuration, use
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
+        boolean isOneProvider = false;
+        for(final String provider : locationManager.getProviders(true)){
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                locationManager.requestLocationUpdates(provider, 2 * 1000, 0.0f, locationListener);
+                isOneProvider = true;
+            }
+        }
+        myLocationOverlay.setEnabled(isOneProvider);
         map.onResume(); //needed for compass, my location overlays, v6.0.0 and up
     }
 
@@ -141,6 +156,9 @@ public class MapActivity extends AppCompatActivity {
         //if you make changes to the configuration, use
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Configuration.getInstance().save(this, prefs);
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            locationManager.removeUpdates(locationListener);
+        }
         map.onPause();  //needed for compass, my location overlays, v6.0.0 and up
     }
 
@@ -173,45 +191,42 @@ public class MapActivity extends AppCompatActivity {
         }
     }
 
-//    @Override public void onLocationChanged(final Location pLoc) {
-//        long currentTime = System.currentTimeMillis();
-//        if (mIgnorer.shouldIgnore(pLoc.getProvider(), currentTime))
-//            return;
-//        double dT = currentTime - mLastTime;
-//        if (dT < 100.0){
-//            //Toast.makeText(this, pLoc.getProvider()+" dT="+dT, Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//        mLastTime = currentTime;
-//
-//        GeoPoint newLocation = new GeoPoint(pLoc);
-//        if (!myLocationOverlay.isEnabled()){
-//            //we get the location for the first time:
-//            myLocationOverlay.setEnabled(true);
-//            map.getController().animateTo(newLocation);
-//        }
-//
-//        GeoPoint prevLocation = myLocationOverlay.getLocation();
-//        myLocationOverlay.setLocation(newLocation);
-//        myLocationOverlay.setAccuracy((int)pLoc.getAccuracy());
-//
-//        if (prevLocation != null && pLoc.getProvider().equals(LocationManager.GPS_PROVIDER)){
-//            mSpeed = pLoc.getSpeed() * 3.6;
-//
-//            //TODO: check if speed is not too small
-//            if (mSpeed >= 0.1){
-//                mAzimuthAngleSpeed = pLoc.getBearing();
-//                myLocationOverlay.setBearing(mAzimuthAngleSpeed);
-//            }
-//        }
-//
-//        if (mTrackingMode){
-//            //keep the map view centered on current location:
-//            map.getController().animateTo(newLocation);
-//            map.setMapOrientation(-mAzimuthAngleSpeed);
-//        } else {
-//            //just redraw the location overlay:
-//            map.invalidate();
-//        }
-//    }
+    private class MyLocationListener implements LocationListener{
+        private final NetworkLocationIgnorer mIgnorer = new NetworkLocationIgnorer();
+        private long mLastTime = 0; // milliseconds
+        private double mSpeed = 0.0; // km/h
+        private float mAzimuthAngleSpeed = 0.0f;
+
+        @Override
+        public void onLocationChanged(@NonNull final Location location) {
+            long currentTime = System.currentTimeMillis();
+            if(mIgnorer.shouldIgnore(location.getProvider(), currentTime))
+                return;
+
+            double dT = currentTime - mLastTime;
+            if(dT < 100.0)
+                return;
+            mLastTime = currentTime;
+
+            GeoPoint newLocation = new GeoPoint(location);
+            if(!myLocationOverlay.isEnabled()){
+                myLocationOverlay.setEnabled(true);
+                map.getController().animateTo(newLocation);
+            }
+
+            GeoPoint prevLocation = myLocationOverlay.getLocation();
+            myLocationOverlay.setLocation(newLocation);
+            myLocationOverlay.setAccuracy((int)location.getAccuracy());
+
+            if(prevLocation != null && location.getProvider().equals(LocationManager.GPS_PROVIDER)){
+                mSpeed = location.getSpeed() * 3.6;
+                if(mSpeed >= 0.1){
+                    mAzimuthAngleSpeed = location.getBearing();
+                    myLocationOverlay.setBearing(mAzimuthAngleSpeed);
+                }
+            }
+
+            map.setMapOrientation(-mAzimuthAngleSpeed);
+        }
+    }
 }
